@@ -1,0 +1,57 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/typeorm-demo/src",
+  "monorepo": true,
+  "root": "apps/typeorm-demo",
+  "compilerOptions": {
+    "webpack": true,
+    "tsConfigPath": "apps/typeorm-demo/tsconfig.app.json"
+  },
+  "projects": {
+    "typeorm-demo": {
+      "type": "application",
+      "root": "apps/typeorm-demo",
+      "entryFile": "main",
+      "sourceRoot": "apps/typeorm-demo/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/typeorm-demo/tsconfig.app.json"
+      }
+    },
+    "sequelize-demo": {
+      "type": "application",
+      "root": "apps/sequelize-demo",
+      "entryFile": "main",
+      "sourceRoot": "apps/sequelize-demo/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/sequelize-demo/tsconfig.app.json"
+      }
+    },
+    "core": {
+      "type": "library",
+      "root": "libs/core",
+      "entryFile": "index",
+      "sourceRoot": "libs/core/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/core/tsconfig.lib.json"
+      }
+    },
+    "typeorm": {
+      "type": "library",
+      "root": "libs/typeorm",
+      "entryFile": "index",
+      "sourceRoot": "libs/typeorm/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/typeorm/tsconfig.lib.json"
+      }
+    },
+    "sequelize": {
+      "type": "library",
+      "root": "libs/sequelize",
+      "entryFile": "index",
+      "sourceRoot": "libs/sequelize/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/sequelize/tsconfig.lib.json"
+      }
+    }
+  }
+}
