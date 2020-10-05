@@ -6,4 +6,5 @@ async function bootstrap() {
   await app.listen(3000);
 }
 
+// noinspection JSIgnoredPromiseFromCall
 bootstrap();
