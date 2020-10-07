@@ -1,0 +1,28 @@
+{
+  "name": "@nestjs-rapid/sequelize",
+  "version": "0.1.0",
+  "description": "Sequelize package for @nestjs-rapid library",
+  "author": "Arthur Khachatrian",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/khachatrian1995/nestjs-rapid"
+  },
+  "bugs": "https://github.com/khachatrian1995/nestjs-rapid/issues",
+  "homepage": "https://github.com/khachatrian1995/nestjs-rapid",
+  "keywords": [
+    "nestjs",
+    "sequelize"
+  ],
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "peerDependencies": {
+    "@nestjs-rapid/core": "^0.1.0",
+    "sequelize": "^5.22.3",
+    "sequelize-typescript": ">=1.1.0",
+    "rxjs": ">=6.5.4"
+  }
+}

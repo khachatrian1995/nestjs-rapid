@@ -1,0 +1,26 @@
+{
+  "name": "@nestjs-rapid/core",
+  "version": "0.1.0",
+  "description": "Core for @nestjs-rapid library",
+  "author": "Arthur Khachatrian",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/khachatrian1995/nestjs-rapid"
+  },
+  "bugs": "https://github.com/khachatrian1995/nestjs-rapid/issues",
+  "homepage": "https://github.com/khachatrian1995/nestjs-rapid",
+  "keywords": [
+    "nestjs",
+    "core",
+    "library"
+  ],
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "peerDependencies": {
+    "@nestjs/common": "^7.0.0"
+  }
+}
