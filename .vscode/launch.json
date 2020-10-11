@@ -1,0 +1,16 @@
+{
+    "configurations": [
+        {
+            "name": "Debug Demo",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceRoot}",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "start:debug"
+            ],
+            "port": 5858
+        }
+    ]
+}
