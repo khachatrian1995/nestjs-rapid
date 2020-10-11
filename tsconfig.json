@@ -12,24 +12,12 @@
     "baseUrl": "./",
     "incremental": true,
     "paths": {
-      "@rapid/core": [
-        "libs/core/src"
+      "nestjs-rapid": [
+        "libs/nestjs-rapid/src"
       ],
-      "@rapid/core/*": [
-        "libs/core/src/*"
+      "nestjs-rapid/*": [
+        "libs/nestjs-rapid/src/*"
       ],
-      "@rapid/typeorm": [
-        "libs/typeorm/src"
-      ],
-      "@rapid/typeorm/*": [
-        "libs/typeorm/src/*"
-      ],
-      "@rapid/sequelize": [
-        "libs/sequelize/src"
-      ],
-      "@rapid/sequelize/*": [
-        "libs/sequelize/src/*"
-      ]
     }
   }
 }
