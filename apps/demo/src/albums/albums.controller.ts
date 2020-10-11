@@ -2,12 +2,13 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UsePipes } fr
 import { EntityExistPipe, EntityUniquePipe } from 'nestjs-rapid';
 import { AlbumsService } from './albums.service';
 import { Album } from './album.entity';
+import { RelationExistPipe } from 'nestjs-rapid/pipes/relation-exist.pipe';
 
 @Controller('albums')
 export class AlbumsController {
   constructor(private readonly albumsService: AlbumsService) {}
 
-  @UsePipes(new EntityUniquePipe(Album))
+  @UsePipes(new RelationExistPipe(Album, 'user'), new EntityUniquePipe(Album))
   @Post()
   create(@Body() album: Omit<Album, 'id'>): Promise<Album> {
     return this.albumsService.insert(album);

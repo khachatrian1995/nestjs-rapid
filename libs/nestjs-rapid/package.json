@@ -1,6 +1,6 @@
 {
   "name": "nestjs-rapid",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Library made to speed up development with NestJS Framework",
   "author": "Arthur Khachatrian",
   "repository": {
