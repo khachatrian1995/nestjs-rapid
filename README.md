@@ -2,8 +2,9 @@
 
 ## Features
 
-- Ensure entity record exists using `EntityExistPipe`
+- Ensure entity exists using `EntityExistPipe`
 - Ensure entity is unique with `EntityUniquePipe`
+- Ensure entity relation exists with `RelationExistPipe`
 
 ## Getting Started
 
@@ -126,6 +127,37 @@ create(@Body() user: Partial<User>): Promise<User> {
 
 - Entity is not unique
 - There was missing or undefined unique columns
+
+Use `RelationExistPipe` to entity relation exists.
+
+As an example lets say we have `Album` entity
+
+```typescript
+@Entity()
+export class Album {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  name: string;
+
+  @ManyToOne(() => User, (user: User) => user.albums)
+  user: User;
+}
+```
+
+To confirm that user exists write
+
+```typescript
+import { RelationExistPipe } from 'nestjs-rapid';
+
+// pass entity type and relation property name to pipe
+@UsePipes(new RelationExistPipe(Album, 'user'))
+@Post()
+create(@Body() user: Partial<User>): Promise<User> {
+  // ...
+}
+```
 
 ## Running demo
 
