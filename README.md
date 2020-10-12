@@ -1,16 +1,14 @@
-**nestjs-rapid** is a tiny library for [NestJS](https://github.com/nestjs/nest) which will take over the routine of validating your [TypeOrm](https://typeorm.io) entities
+**nestjs-rapid** is a tiny library made to speed up your development using [NestJS](https://github.com/nestjs/nest) framework
 
 ## Features
 
-- Ensure entity exists using `EntityExistPipe`
-- Ensure entity is unique with `EntityUniquePipe`
-- Ensure entity relation exists with `RelationExistPipe`
+- Validate [TypeOrm](https://typeorm.io) entities using `EntityExistPipe`, `EntityUniquePipe` and `RelationExistPipe`
 
 ## Getting Started
 
 ### Prerequisites
 
-nestjs-rapid lives on top of the [NestJS](https://docs.nestjs.com) and requires [TypeOrm](https://docs.nestjs.com/techniques/database) to be set up
+[NestJS](https://docs.nestjs.com) and [TypeOrm](https://docs.nestjs.com/techniques/database) are required
 
 ### Installing
 
@@ -20,144 +18,102 @@ $ npm install --save nestjs-rapid
 
 ## Usage
 
-Use `EntityExistPipe` to ensure entity record exists. It searches for existing record by primary key and if it doesn't find one throws informative BadRequestException
+`EntityExistPipe` ensures entity record exists, otherwise throws `BadRequestException`
 
-Lets say we have user entity with single primary column
+Consider `Customer` entity with a single primary column
 
 ```typescript
 @Entity()
-export class User {
-  @PrimaryGeneratedColumn()
+export class Customer {
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
-  firstName: string;
-
-  @Column()
-  lastName: string;
+  name: string;
 }
 ```
 
-We can apply `EntityExistPipe` on the route parameter to make sure user exists
+Apply `EntityExistPipe` on the route parameter to make sure `customer` record exists
 
 ```typescript
 import { EntityExistPipe } from 'nestjs-rapid';
 
 // route parameter path name must repeat entity primary property name. In this case id
-@UsePipes(new EntityExistPipe(User))
+@UsePipes(new EntityExistPipe(Customer))
 @Get(':id')
-findOne(@Param('id') userId: string): Promise<User> {
-  // user with id equal to userId exists
+findOne(@Param('id') customerId: string): Promise<Customer> {
+  // customer with id equal to customerId exists
 }
 ```
 
-Primary key could also be composite
+Composite primary keys and relation columns are also supported
+
+> Note: You can apply `EntityExistPipe` on `param` or `body` route parameters
+
+`EntityUniquePipe` ensures entity record is unique, otherwise throws `BadRequestException`
+
+Suppose we have `Manufacturer` entity
 
 ```typescript
 @Entity()
-export class UserDialog {
-  @PrimaryColumn()
-  userId: string;
-
-  @PrimaryColumn()
-  dialogId: string;
-}
-```
-
-This kind of data can be sent to the server using query parameters or POST request body. We are able to validate them too in the same manner
-
-```typescript
-// query must contain userId and dialogId parameters
-@UsePipes(new EntityExistPipe(UserDialog))
-@Get()
-findOne(@Query() query: Pick<UserDialog, userId | dialogId>): Promise<UserDialog> {
-  // ...
-}
-
-// userDialog must contain userId and dialogId properties
-@UsePipes(new EntityExistPipe(UserDialog))
-@Post()
-findOne(@Body() userDialog: Partial<UserDialog>): Promise<UserDialog> {
-  // ...
-}
-```
-
-`EntityExistPipe` throws informative BadRequestException for such cases
-
-- Entity record not found
-- There was missing or undefined primary columns
-- Primary column which links to another table was not found
-
-Use `EntityUniquePipe` to ensure entity is unique.
-It works in conjunction with TypeOrm unique columns.
-First it searches for existing record with the same unique columns
-and if it finds one throws informative BadRequestException.
-
-Lets add few unique columns to `User`
-
-```typescript
-@Entity()
-@Unique(['firstName', 'lastName'])
-export class User {
-  @PrimaryGeneratedColumn()
+@Unique(['name'])
+export class Manufacturer {
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
-  firstName: string;
-
-  @Column()
-  lastName: string;
+  name: string;
 }
 ```
 
-Then you can check if `User` is unique
+Then you can check if `Manufacturer` is unique
 
 ```typescript
 import { EntityUniquePipe } from 'nestjs-rapid';
 
-// user must contain firstName and lastName properties
-@UsePipes(new EntityUniquePipe(User))
+@UsePipes(new EntityUniquePipe(Manufacturer))
 @Post()
-create(@Body() user: Partial<User>): Promise<User> {
-  // ...
+create(@Body() manufacturer: Partial<Manufacturer>):Promise<Manufacturer> {
+  // manufacturer has unique name
 }
 ```
 
-`EntityUniquePipe` throws informative BadRequestException for such cases
+Relation columns are also supported
 
-- Entity is not unique
-- There was missing or undefined unique columns
+> Note: You can use `EntityUniquePipe` with POST requests only
 
-Use `RelationExistPipe` to entity relation exists.
+`RelationExistPipe` ensures entity relation exists, otherwise throws `BadRequestException`
 
-As an example lets say we have `Album` entity
+Lets say we have `Product` entity with relation property `manufacturer`
 
 ```typescript
 @Entity()
-export class Album {
-  @PrimaryGeneratedColumn()
-  id: number;
+export class Product {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   name: string;
 
-  @ManyToOne(() => User, (user: User) => user.albums)
-  user: User;
+  @ManyToOne(() => Manufacturer, (manufacturer: Manufacturer) => manufacturer.products)
+  manufacturer: Manufacturer;
 }
 ```
 
-To confirm that user exists write
+To confirm that `manufacturer` exists write
 
 ```typescript
 import { RelationExistPipe } from 'nestjs-rapid';
 
-// pass entity type and relation property name to pipe
-@UsePipes(new RelationExistPipe(Album, 'user'))
+// pass in relation type and lambda that returns relation property
+@UsePipes(new RelationExistPipe(Manufacturer, (product: Product) => product.manufacturer))
 @Post()
-create(@Body() user: Partial<User>): Promise<User> {
-  // ...
+create(@Body() product: Omit<Product, 'id'>): Promise<Product> {
+  // product manufacturer exists
 }
 ```
+
+Explore [demo](apps/demo) project to see more examples
 
 ## Running demo
 

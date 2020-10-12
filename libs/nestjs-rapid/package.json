@@ -1,7 +1,7 @@
 {
   "name": "nestjs-rapid",
-  "version": "0.3.0",
-  "description": "Library made to speed up development with NestJS Framework",
+  "version": "0.3.1",
+  "description": "tiny library made to speed up your development using NestJS framework",
   "author": "Arthur Khachatrian",
   "repository": {
     "type": "git",
@@ -16,7 +16,8 @@
     "typeorm",
     "validation",
     "exist",
-    "unique"
+    "unique",
+    "relation"
   ],
   "license": "MIT",
   "main": "dist/index.js",

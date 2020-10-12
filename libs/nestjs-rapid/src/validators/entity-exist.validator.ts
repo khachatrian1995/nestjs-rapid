@@ -1,54 +1,69 @@
-import { DeepPartial, FindConditions, getRepository, Repository } from 'typeorm';
+import { DeepPartial, EntityMetadata, FindConditions, getRepository, Repository } from 'typeorm';
 import { EntityTarget } from 'typeorm/common/EntityTarget';
-import {
-  MissingPropertiesError,
-  ResourceNotFoundError,
-  ManyResourcesNotFoundError
-} from '../errors';
-import { Resource } from '../interfaces';
+import { IndexMetadata } from 'typeorm/metadata/IndexMetadata';
 
 export class EntityExistValidator<Entity> {
   private readonly entityRepository: Repository<Entity>;
+  private readonly entityMetadata: EntityMetadata;
 
   constructor(entityTarget: EntityTarget<Entity>) {
     this.entityRepository = getRepository(entityTarget);
+    this.entityMetadata = this.entityRepository.metadata;
   }
 
-  async exist(primary: DeepPartial<Entity>): Promise<boolean> {
+  async exist(entity: DeepPartial<Entity>): Promise<boolean> {
+    if (
+      this.entityMetadata.hasAllPrimaryKeys(entity) &&
+      (await this.findOneByPrimaryKeys(entity))
+    ) {
+      return true;
+    } else if (await this.findOneByUniqueKeys(entity)) {
+      return true;
+    }
+    return false;
+  }
+
+  async findOneByPrimaryKeys(entity: DeepPartial<Entity>): Promise<Entity | undefined> {
     const findConditions: FindConditions<Entity> = {};
-    const missingProperties: string[] = [];
-    const absentResources: Resource<any>[] = [];
-    for (const column of this.entityRepository.metadata.primaryColumns) {
-      const propertyName = Object.keys(primary).find((propertyName: string) => {
+    for (const column of this.entityMetadata.primaryColumns) {
+      const propertyName = Object.keys(entity).find((propertyName: string) => {
         return propertyName === column.propertyName;
       });
-      if (!propertyName || !primary[propertyName]) {
-        missingProperties.push(column.propertyName);
-        continue;
+      if (!propertyName || !entity[propertyName]) {
+        return undefined;
       }
       const relationMetadata = column.relationMetadata;
       if (relationMetadata) {
-        const relationExist = await new EntityExistValidator(relationMetadata.type).exist(
-          primary[propertyName]
-        );
-        if (!relationExist) {
-          const relationType = relationMetadata.type;
-          const relationName = typeof relationType === 'string' ? relationType : relationType.name;
-          absentResources.push({ name: relationName, value: primary[propertyName] });
-          continue;
+        const entityExistValidator = new EntityExistValidator(relationMetadata.type);
+        if (!(await entityExistValidator.exist(entity[propertyName]))) {
+          return undefined;
         }
       }
-      findConditions[propertyName] = primary[propertyName];
+      findConditions[propertyName] = entity[propertyName];
     }
-    if (missingProperties.length > 0) {
-      throw new MissingPropertiesError(missingProperties);
+    return this.entityRepository.findOne(findConditions);
+  }
+
+  findOneByUniqueKeys(entity: DeepPartial<Entity>): Promise<Entity | undefined> {
+    const uniqueIndices: IndexMetadata[] = this.entityMetadata.indices.filter(
+      (index: IndexMetadata) => index.isUnique
+    );
+    for (const uniqueIndex of uniqueIndices) {
+      const findConditions: FindConditions<Entity> = {};
+      for (const column of uniqueIndex.columns) {
+        const propertyName = Object.keys(entity).find((key: string) => {
+          return key === column.propertyName;
+        });
+        if (!propertyName || !entity[propertyName]) {
+          break;
+        }
+        findConditions[propertyName] = entity[propertyName];
+      }
+      if (Object.keys(findConditions).length !== uniqueIndex.columns.length) {
+        continue;
+      }
+      return this.entityRepository.findOne(findConditions);
     }
-    if (absentResources.length == 1) {
-      throw new ResourceNotFoundError(absentResources[0]);
-    }
-    if (absentResources.length > 1) {
-      throw new ManyResourcesNotFoundError(absentResources);
-    }
-    return !!(await this.entityRepository.findOne(findConditions));
+    return undefined;
   }
 }

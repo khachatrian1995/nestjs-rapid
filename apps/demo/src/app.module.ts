@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersModule } from './users/users.module';
-import { AlbumsModule } from './albums/albums.module';
+import { CustomersModule } from './customers/customers.module';
+import { ManufacturersModule } from './manufacturers/manufacturers.module';
+import { OrdersModule } from './orders/orders.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -15,8 +17,10 @@ import { AlbumsModule } from './albums/albums.module';
       autoLoadEntities: true,
       synchronize: true
     }),
-    UsersModule,
-    AlbumsModule
+    CustomersModule,
+    ManufacturersModule,
+    OrdersModule,
+    ProductsModule
   ]
 })
 export class AppModule {}
